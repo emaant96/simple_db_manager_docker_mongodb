@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+
+  backend:
+    build: .
+    container_name: mongopy
+    restart: always
+    depends_on: 
+    - database
+    networks:
+    - mongodb_network
+    ports:
+    - 8080:8080
+    command: python dbwork.py
+
+  database:
+    image: mongo 
+    container_name: mongodb
+    restart: always
+    volumes:
+    - ./database:/data/db
+    ports:
+    - 27017:27017
+    networks:
+    - mongodb_network
+
+  interface:
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+    - ME_CONFIG_MONGODB_SERVER=mongodb
+    - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+    restart: always
+    ports:
+    - 8081:8081
+    depends_on:
+    - database
+    networks:
+    - mongodb_network
+
+networks:
+    mongodb_network:
+        name: mongodb_network
